@@ -1,10 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const Goal = require("../modal/goalModal");
+const User = require("../modal/userModal");
 //@desc get goals
 //@routre GET /api/goals
 //@access privet
 const getGoals = asyncHandler(async (req, res) => {
-  const goals = await Goal.find();
+  const goals = await Goal.find({ user: req.user.id });
   res.status(200).json(goals);
 });
 //@desc get goals
@@ -15,8 +16,8 @@ const setGoal = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Please add title");
   }
-  const goal = await Goal.create({ text: req.body.text });
-  res.status(200).json(goal);
+  const goal = await Goal.create({ text: req.body.text, user: req.user.id });
+  res.status(201).json(goal);
 });
 
 //@desc update goals
@@ -27,6 +28,18 @@ const updateGoal = asyncHandler(async (req, res) => {
   if (!goal) {
     res.status(400);
     throw new Error("goald not found");
+  }
+  //check for user
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    res.status(401);
+    throw new Error("User not exist");
+  }
+
+  //make sure loged user mathches the goal user
+  if (goal.user.toString() !== user.id) {
+    res.status(401);
+    throw new Error("user not aurthorized");
   }
   const updateGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -39,11 +52,26 @@ const updateGoal = asyncHandler(async (req, res) => {
 //@access privet
 const deleteGoal = asyncHandler(async (req, res) => {
   const goal = await Goal.findById(req.params.id);
+  console.log("thiussisisi", goal);
   if (!goal) {
     res.status(400);
     throw new Error("goald not found");
   }
-  await goal.remove();
+
+  //check for user
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    res.status(401);
+    throw new Error("User not exist");
+  }
+
+  //make sure loged user mathches the goal user
+  if (goal.user.toString() !== user.id) {
+    res.status(401);
+    throw new Error("user not aurthorized");
+  }
+
+  await Goal.findByIdAndDelete(req.params.id);
   res.status(200).json({ id: req.params.id });
 });
 
