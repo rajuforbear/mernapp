@@ -3,6 +3,7 @@ import DashBord from "./pages/dashbord";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Header from "./componets/Header";
+import { ToastContainer } from "react-toastify";
 function App() {
   return (
     <>
@@ -15,6 +16,7 @@ function App() {
             <Route path="/Register" element={<Register />} />
           </Routes>
         </div>
+        <ToastContainer />
       </Router>
     </>
   );

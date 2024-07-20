@@ -1,5 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { register, reset } from "../../features/auth/authSlice";
+import Spinner from "../../componets/Sppinner";
 
 function Register() {
   const [formData, setFromData] = useState({
@@ -9,6 +14,20 @@ function Register() {
     password2: "",
   });
   const { name, email, password, password2 } = formData;
+  const naviaget = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+    if (isSuccess || user) {
+      naviaget("/");
+    }
+    dispatch(reset());
+  }, [user, dispatch, naviaget, isError, isSuccess, message]);
   const onChange = (e) => {
     setFromData((prev) => ({
       ...prev,
@@ -17,7 +36,22 @@ function Register() {
   };
   const onSubmit = (e) => {
     e.preventDefault();
+    if (password != password2) {
+      toast.error("Please do not match");
+    } else {
+      const userdata = {
+        name,
+        email,
+        password,
+      };
+
+      dispatch(register(userdata));
+    }
   };
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <>
       <section className="heading">
@@ -26,7 +60,7 @@ function Register() {
         </h1>
         <p>Please create an account</p>
       </section>
-      <sectiom className="form">
+      <section className="form">
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <input
@@ -78,7 +112,7 @@ function Register() {
             </button>
           </div>
         </form>
-      </sectiom>
+      </section>
     </>
   );
 }

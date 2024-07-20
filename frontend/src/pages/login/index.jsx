@@ -24,7 +24,7 @@ function Login() {
         </h1>
         <p>Please Login Here</p>
       </section>
-      <sectiom className="form">
+      <section className="form">
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <input
@@ -55,7 +55,7 @@ function Login() {
             </button>
           </div>
         </form>
-      </sectiom>
+      </section>
     </>
   );
 }
